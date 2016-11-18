@@ -8,21 +8,46 @@
 
     <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 
-    <link rel="import" href="../../bower_components/iron-demo-helpers/demo-pages-shared-styles.html">
-    <link rel="import" href="../../bower_components/iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="<%= name %>.html">
 
-    <style is="custom-style" include="demo-pages-shared-styles">
+    <style>
+      body {
+        background-color: #fafafa; 
+      }
     </style>
   </head>
   <body>
-    <div class="vertical-section-container centered">
-      <h3>Basic <%= name %> demo</h3>
-      <demo-snippet>
-        <template>
-          <<%= name %>></<%= name %>>
-        </template>
-      </demo-snippet>
-    </div>
+    <x-demo></x-demo>
+    <dom-module id="x-demo">
+      <template>
+        <style>
+          .horizontal-section {
+            min-width: 200px;
+            max-width: 400px;
+          }
+          h3 {
+            margin: 20px 0 10px 0;
+            border-bottom: 1px solid #ccc;
+          }
+        </style>
+        <div class="vertical-section-container centered">
+
+          <h3>Basic <%= name %> demo</h3>
+          <div class="horizontal-section">
+            <<%= name %> prop1="[[data]]"></<%= name %>>
+          </div>
+
+        </div>
+      </template>
+    </dom-module>
+
+    <script>
+      Polymer({
+        is: 'x-demo',
+        ready: function() {
+          this.data = 'custom text';
+        }
+      });
+    </script>
   </body>
 </html>
