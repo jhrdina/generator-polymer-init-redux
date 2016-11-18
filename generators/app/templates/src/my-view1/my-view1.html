@@ -1,0 +1,53 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../shared-styles.html">
+
+<link rel="import" href="../my-counter/my-counter.html">
+
+<dom-module id="my-view1">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+    </style>
+    
+    <div class="card">
+      <div class="circle">1</div>
+      <h1>Redux Counters Demo</h1>
+      <template is="dom-repeat" items="[[counters]]">
+        <my-counter
+          value="[[item.value]]"
+          on-increment="_onCounterIncrement"
+          on-decrement="_onCounterDecrement">
+        </my-counter>
+      </template>
+    </div>
+  </template>
+  <script>
+
+    Polymer({
+      is: 'my-view1',
+      properties: {
+        counters: {
+          type: Array,
+          value: []
+        },
+      },
+
+      _onCounterIncrement: function(event) {
+        this.fire('increment-counter', {
+          id: event.model.item.id
+        });
+        event.stopPropagation();
+      },
+
+      _onCounterDecrement: function(event) {
+        this.fire('decrement-counter', {
+          id: event.model.item.id
+        });
+        event.stopPropagation();
+      }
+    })
+  </script>
+</dom-module>
