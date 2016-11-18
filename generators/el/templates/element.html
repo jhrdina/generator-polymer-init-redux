@@ -1,0 +1,34 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<!--
+`<%= name %>`
+<%= description %>
+
+@demo demo.html 
+-->
+
+<dom-module id="<%= name %>">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>I'm [[prop1]] element.</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: '<%= name %>',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: '<%= name %>',
+        },
+      },
+
+    });
+  </script>
+</dom-module>
