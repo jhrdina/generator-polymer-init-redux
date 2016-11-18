@@ -10,7 +10,9 @@ npm install -g yo
 npm install -g generator-polymer-init-redux
 ```
 
-Then generate your new project:
+## Usage
+
+Generate your new project with
 
 ```bash
 polymer init redux
@@ -20,6 +22,12 @@ or use Yeoman directly:
 
 ```bash
 yo polymer-init-redux
+```
+
+To **add a new element** to the project use
+
+```bash
+yo polymer-init-redux:el element-name
 ```
 
 ## Getting To Know Yeoman
