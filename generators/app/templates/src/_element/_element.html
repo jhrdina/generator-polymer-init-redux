@@ -78,7 +78,7 @@
           role="main">
         <my-view1
           name="view1"
-          counters="[[counters]]"
+          counters="[[model.counters]]"
           on-increment-counter="_onIncrementCounter"
           on-decrement-counter="_onDecrementCounter"></my-view1>
         <my-view2 name="view2"></my-view2>
@@ -102,9 +102,9 @@
           reflectToAttribute: true,
           observer: '_pageChanged'
         },
-        counters: {
-          type: Array,
-          statePath: 'counters'
+        model: {
+          type: Object,
+          statePath: function(state) { return state; }
         },
       },
 
