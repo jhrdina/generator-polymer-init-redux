@@ -2,6 +2,7 @@
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var _s = require('underscore.string');
+var path = require('path');
 
 module.exports = yeoman.Base.extend({
   constructor: function () {
@@ -35,12 +36,12 @@ module.exports = yeoman.Base.extend({
         name: 'description',
         message: 'Brief description of the element'
       },
-      //{
-      //  name: 'includeTests',
-      //  message: 'Would you like to include test files?',
-      //  type: 'confirm',
-      //  default: true
-      //}
+      {
+        name: 'includeTests',
+        message: 'Would you like to include test files?',
+        type: 'confirm',
+        default: true
+      }
     ];
 
     return this.prompt(prompts).then(function (props) {
@@ -67,7 +68,31 @@ module.exports = yeoman.Base.extend({
       allProps);
 
     if (this.props.includeTests) {
-      // TODO: Implement tests support
+      var pathToTest = path.join(this.options.path, this.name, 'test', this.name + '.html');
+
+      this.fs.copyTpl(
+        this.templatePath('element.test.html'),
+        pathToTest,
+        allProps
+      );
+
+      // Add Test to index.html
+
+      var relPathToTest = path.relative(
+        this.destinationPath('test'),
+        pathToTest
+      );
+
+      var testsIndexPath = path.join(this.destinationPath('test'), 'index.html');
+
+      var file = this.fs.read(testsIndexPath).toString();
+      var pattern = 'WCT.loadSuites([';
+      file = file.replace(
+        pattern,
+        pattern + "\n        '" + relPathToTest + "?dom=shady'," +
+                  "\n        '" + relPathToTest + "?dom=shadow',"
+      );
+      this.fs.write(testsIndexPath, file);
     }
   },
 
