@@ -22,10 +22,10 @@ module.exports = yeoman.Base.extend({
 
   initializing: function () {
     if (!this.name.includes('-')) {
-      this.yo.emit('error', new Error(
-        '\nUh oh, custom elements must include a hyphen in their name. ' +
+      this.log.error('\nUh oh, custom elements must include a hyphen in their name. ' +
         'Please try again.'
-      ));
+      );
+      process.exit(1);
     }
   },
 
