@@ -12,4 +12,18 @@ Actions = {
     type: 'DECREMENT_COUNTER',
     id
   }),
+  incBoundCounter: () => ({
+    type: 'INC_BOUND_COUNTER'
+  }),
+  decBoundCounter: () => ({
+    type: 'DEC_BOUND_COUNTER'
+  }),
+  setBoundCounter: (value) => ({
+    type: 'SET_BOUND_COUNTER',
+    value
+  }),
+  changeScreen: (screen) => ({
+    type: 'CHANGE_SCREEN',
+    screen
+  })
 }

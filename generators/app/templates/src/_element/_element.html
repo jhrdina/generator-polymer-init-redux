@@ -50,7 +50,7 @@
     <app-location route="{{route}}"></app-location>
     <app-route
         route="{{route}}"
-        pattern="/:page"
+        pattern="/:screen"
         data="{{routeData}}"
         tail="{{subroute}}">
     </app-route>
@@ -68,12 +68,12 @@
       </app-header>
 
       <iron-pages
-          selected="[[page]]"
+          selected="[[screen]]"
           attr-for-selected="name"
           fallback-selection="view404"
           role="main">
         <my-view1 name="view1"></my-view1>
-        <my-view2 name="view2"></my-view2>
+        <my-view2 name="view2" route="{{subroute}}"></my-view2>
         <my-view3 name="view3"></my-view3>
         <my-view404 name="view404"></my-view404>
       </iron-pages>
@@ -88,34 +88,33 @@
       behaviors: [ StoreBehavior ],
 
       properties: {
-        page: {
+        screen: {
           type: String,
-          reflectToAttribute: true,
-          observer: '_pageChanged'
-        },
-        model: {
-          type: Object,
-          statePath: function(state) { return state; }
-        },
+          statePath: 'screen'
+        }
       },
 
       observers: [
-        '_routePageChanged(routeData.page)'
+        '_routeChanged(routeData.screen)',
+        '_updateRoute(screen)'
       ],
 
-      _routePageChanged: function(page) {
-        this.page = page || 'view1';
+      _routeChanged: function(screen) {
+        if (screen !== this.screen) {
+          this.dispatch(Actions.changeScreen(screen));
+        }
       },
 
-      _pageChanged: function(page) {
-        // Load page import on demand. Show 404 page if fails
-        var resolvedPageUrl = this.resolveUrl(`../my-${page}/my-${page}.html`);
-        this.importHref(resolvedPageUrl, null, this._showPage404, true);
-      },
+      _updateRoute: function(screen) {
+        if (screen !== this.routeData.screen) {
+          this.set('routeData.screen', screen);
+        }
 
-      _showPage404: function() {
-        this.page = 'view404';
-      },
+        const resolvedScreenUrl = this.resolveUrl(`../my-${screen}/my-${screen}.html`);
+        this.importHref(resolvedScreenUrl, null, () => {
+          this.dispatch(Actions.changeScreen('view404'));
+        }, true);
+      }
     });
   </script>
 </dom-module>
