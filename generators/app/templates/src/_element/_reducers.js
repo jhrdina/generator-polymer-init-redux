@@ -39,6 +39,6 @@ function counters(state, action) {
   }
 }
 
-const appReducer = Redux.combineReducers({
+const reducer = Redux.combineReducers({
   counters,
 });

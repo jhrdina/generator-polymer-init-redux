@@ -1,7 +1,6 @@
 'use strict';
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
-var yosay = require('yosay');
 var _s = require('underscore.string');
 
 module.exports = yeoman.Base.extend({
@@ -29,7 +28,7 @@ module.exports = yeoman.Base.extend({
         validate: function (name) {
           var nameContainsHyphen = name.includes('-');
           if (!nameContainsHyphen) {
-            _this.log('\nUh oh, custom elements must include a hyphen in ' + 
+            _this.log('\nUh oh, custom elements must include a hyphen in ' +
               'their name. Please try again.');
           }
           return nameContainsHyphen;
@@ -72,18 +71,20 @@ module.exports = yeoman.Base.extend({
       this.props);
 
     // Copy Element
-    this.fs.copy(
-      this.templatePath('src/_element/_actions.js'),
-      this.destinationPath('src/' + elementName + '/actions.js'));
-
-    this.fs.copy(
-      this.templatePath('src/_element/_reducers.js'),
-      this.destinationPath('src/' + elementName + '/reducers.js'));
 
     this.fs.copyTpl(
       this.templatePath('src/_element/_element.html'),
       'src/' + elementName + '/' + elementName + '.html',
       this.props);
+
+    var that = this;
+    ['actions.js', 'reducers.js', 'store.html']
+      .forEach(function (file) {
+        that.fs.copyTpl(
+          that.templatePath('src/_element/_' + file),
+          'src/' + elementName + '/' + file,
+          that.props);
+      });
   },
 
   install: function () {
