@@ -1,0 +1,109 @@
+<link rel="import" href="db-base.html">
+<link rel="import" href="uid-generator.html">
+
+<script src="../../bower_components/firebase/firebase.js"></script>
+
+<script>
+
+// Generated config from Firebase console
+var config = {
+  apiKey: "abcdefgh",
+  authDomain: "<%= name %>.firebaseapp.com",
+  databaseURL: "https://<%= name %>.firebaseio.com",
+  projectId: "<%= name %>",
+  storageBucket: "<%= name %>.appspot.com",
+  messagingSenderId: "1234"
+};
+firebase.initializeApp(config);
+
+(() => {
+  window.Db = Object.assign(window.Db || {}, {
+
+    _add: function(path, value) {
+      return firebase.database().ref(path).push(value);
+    },
+
+
+    _update: function(path, id, value) {
+      return firebase.database().ref(`${path}/${id}`).set(value);
+    },
+
+
+    _delete: function(path, id) {
+      return firebase.database().ref(`${path}/${id}`).set(null);
+    },
+
+
+    _login: function(credentials) {
+      return firebase.auth()
+        .signInWithEmailAndPassword(credentials.email, credentials.password);
+    },
+
+
+    _logout: function() {
+      return firebase.auth().signOut();
+    },
+
+
+    _createUser: function(credentials) {
+      return firebase.auth()
+        .createUserWithEmailAndPassword(credentials.email, credentials.password);
+    },
+
+
+    _sendPasswordResetEmail: function(email) {
+      return firebase.auth().sendPasswordResetEmail(email);
+    },
+
+
+    _confirmPasswordReset: function(code, newPassword) {
+      return firebase.auth().confirmPasswordReset(code, newPassword);
+    },
+
+    genId: generatePushID,
+
+    connectAuthActions: function(dispatch) {
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          dispatch({
+            type: 'LOGIN_SUCCESS',
+            user: user
+          });
+        } else {
+          dispatch({
+            type: 'LOGOUT_SUCCESS',
+          });
+        }
+      });
+    },
+
+    connectToActions: function(dispatch, entitiesStr, entityStr) {
+      const entityStrUU = entityStr.toUpperCase();
+
+      firebase.database().ref(entitiesStr).on('child_added', (snapshot) => {
+        dispatch({
+          type: `ADD_${entityStrUU}_SUCCESS`,
+          key: snapshot.key,
+          value: snapshot.val()
+        });
+      });
+
+      firebase.database().ref(entitiesStr).on('child_changed', (snapshot) => {
+        dispatch({
+          type: `UPDATE_${entityStrUU}_SUCCESS`,
+          key: snapshot.key,
+          value: snapshot.val()
+        });
+      });
+
+      firebase.database().ref(entitiesStr).on('child_removed', (snapshot) => {
+        dispatch({
+          type: `DELETE_${entityStrUU}_SUCCESS`,
+          key: snapshot.key
+        });
+      });
+    }
+
+  });
+})();
+</script>

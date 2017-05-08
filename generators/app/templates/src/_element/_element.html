@@ -97,7 +97,13 @@
       observers: [
         '_routeChanged(routeData.screen)',
         '_updateRoute(screen)'
-      ],
+      ],<% if (includeDb) { %>
+
+      ready() {
+        Db.connectAuthActions(this.dispatch);
+        Db.connectToActions(this.dispatch, 'users', 'user');
+        Db.connectToActions(this.dispatch, 'things', 'thing');
+      },<% } %>
 
       _routeChanged: function(screen) {
         if (screen !== this.screen) {

@@ -1,0 +1,205 @@
+<script>
+
+(() => {
+  function firstLetterUpper(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  window.Db = Object.assign(window.Db || {}, {
+
+    // Virtual functions - private
+
+    _add: function(path, id, value) {},
+
+    _update: function(path, id, value) {},
+
+    _delete: function(path, id) {},
+
+    _connectToActions: function(dispatch, entitiesStr, entityStr) {},
+
+    _login: function(credentials) {},
+
+    _logout: function() {},
+
+    _createUser: function(credentials) {},
+
+    _sendPasswordResetEmail: function(email) {},
+
+    // Virtual functions - public
+    
+    genId: function() {},
+
+    connectAuthActions: function(dispatch) {},
+
+    connectToActions: function(dispatch, entitiesStr, entityStr) {},
+
+    // Shared
+
+    makeEntityReducer: function(entityStr) {
+      const entityStrUU = entityStr.toUpperCase();
+
+      return (state, action) => {
+        if (!state) {
+          state = {};
+        }
+
+        switch (action.type) {
+          case `ADD_${entityStrUU}_SUCCESS`:
+          case `UPDATE_${entityStrUU}_SUCCESS`:
+            const valObj = {};
+            valObj[action.key] = action.value;
+            return Object.assign({}, state, valObj);
+          case `DELETE_${entityStrUU}_SUCCESS`:
+            const newObj = Object.assign({}, state);
+            delete newObj[action.key];
+            return newObj;
+          default:
+            return state;
+        }
+      }
+    },
+
+
+    makeAuthActions: function(actions) {
+      // LOGIN Action
+      actions.login = (credentials) => (dispatch) => {
+        dispatch({
+          type: 'LOGIN_START'
+        });
+
+        return Db._login(credentials)
+          .then(r => {})
+          .catch(error => {
+            dispatch({
+              type: 'LOGIN_ERROR',
+              error: error.message
+            });
+          });
+      };
+
+      actions.createUser = (credentials) => (dispatch) => {
+        dispatch({
+          type: 'CREATE_USER_START'
+        });
+
+        return Db._createUser(credentials)
+          .then(r => {})
+          .catch(error => {
+            dispatch({
+              type: 'CREATE_USER_ERROR',
+              error: error.message
+            });
+          });
+      };
+
+      actions.logout = () => (dispatch) => {
+        dispatch({
+          type: 'LOGOUT_START'
+        });
+
+        return Db._logout()
+          .then(r => {})
+          .catch(error => {
+            dispatch({
+              type: 'LOGOUT_ERROR',
+              error: error.message
+            });
+          });
+      };
+
+      actions.sendPasswordResetEmail = (email) => (dispatch) => {
+        dispatch({
+          type: 'SEND_PASSWORD_RESET_EMAIL_START'
+        });
+
+        return Db._sendPasswordResetEmail(email)
+          .then(r => {
+            dispatch({
+              type: 'SEND_PASSWORD_RESET_EMAIL_SUCCESS'
+            });
+          })
+          .catch(error => {
+            dispatch({
+              type: 'SEND_PASSWORD_RESET_EMAIL_ERROR',
+              error: error.message
+            });
+          });
+      };
+
+      actions.confirmPasswordReset = (code, newPassword) => (dispatch) => {
+        dispatch({
+          type: 'CONFIRM_PASSWORD_RESET_START'
+        });
+
+        return Db._confirmPasswordReset(email)
+          .then(r => {
+            dispatch({
+              type: 'CONFIRM_PASSWORD_RESET_SUCCESS'
+            });
+          })
+          .catch(error => {
+            dispatch({
+              type: 'CONFIRM_PASSWORD_RESET_ERROR',
+              error: error.message
+            });
+          });
+      };
+    },
+
+
+    makeEntityActions: function(actions, entitiesStr, entityStr) {
+      const entityStrU = firstLetterUpper(entityStr);
+      const entityStrUU = entityStr.toUpperCase();
+
+      // ADD Action
+      actions[`add${entityStrU}`] = (value) => (dispatch) => {
+        dispatch({
+          type: `ADD_${entityStrUU}_START`
+        });
+
+        return Db._add(entitiesStr, value)
+          .then(r => {})
+          .catch(error => {
+            dispatch({
+              type: `ADD_${entityStrUU}_ERROR`,
+              error: error.message
+            });
+          });
+      };
+
+      // UPDATE Action
+      actions[`update${entityStrU}`] = (id, value) => (dispatch) => {
+        dispatch({
+          type: `UPDATE_${entityStrUU}_START`
+        });
+
+        return Db._update(entitiesStr, id, value)
+          .then(r => {})
+          .catch(error => {
+            dispatch({
+              type: `UPDATE_${entityStrUU}_ERROR`,
+              error: error.message
+            });
+          });
+      };
+
+      // DELETE Action
+      actions[`delete${entityStrU}`] = (id) => (dispatch) => {
+        dispatch({
+          type: `DELETE_${entityStrUU}_START`
+        });
+
+        return Db._delete(entitiesStr, id)
+          .then(r => {})
+          .catch(error => {
+            dispatch({
+              type: `DELETE_${entityStrUU}_ERROR`,
+              error: error.message
+            });
+          });
+      };
+    }
+
+  });
+})();
+</script>

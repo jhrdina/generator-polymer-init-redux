@@ -26,4 +26,9 @@ Actions = {
     type: 'CHANGE_SCREEN',
     screen
   })
-}
+};
+<% if (includeDb) { %>
+Db.makeAuthActions(Actions);
+Db.makeEntityActions(Actions, 'users', 'user');
+Db.makeEntityActions(Actions, 'things', 'thing');
+<% } %>

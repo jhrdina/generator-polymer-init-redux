@@ -1,0 +1,247 @@
+<link rel="import" href="db-base.html">
+<link rel="import" href="uid-generator.html">
+
+<script src="demo-data.js"></script>
+
+<script>
+(() => {
+  const callbacks = {};
+  const authCallbacks = [];
+
+  const FAKE_DELAY = 350;
+  // Automatically logs in user on startup. Set to null to disable.
+  const AUTO_LOGIN_EMAIL = 'test.user@email.com';
+  // const AUTO_LOGIN_EMAIL = null;
+
+  const _db = Db.demoData; // from demo-data.js
+  const _users = Db.demoUsers; // from demo-data.js
+
+  _signedUserEmail = null;
+
+  function addCallback(path, type, f) {
+    if (!callbacks[path])
+      callbacks[path] = {};
+
+    if (!callbacks[path][type])
+      callbacks[path][type] = [];
+
+    callbacks[path][type].push(f);
+  }
+
+  function fireAddEvent(path, key, value) {
+    if (callbacks[path] && callbacks[path]['add']) {
+      callbacks[path]['add'].forEach((f) => f(key, value));
+    }
+  }
+
+  function fireDeleteEvent(path, key) {
+    if (callbacks[path] && callbacks[path]['delete']) {
+      callbacks[path]['delete'].forEach((f) => f(key));
+    }
+  }
+
+  function fireUpdateEvent(path, key, value) {
+    if (callbacks[path] && callbacks[path]['update']) {
+      callbacks[path]['update'].forEach((f) => f(key, value));
+    }
+  }
+
+  function fireInitialAdd() {
+    Object.keys(_db).forEach(path => {
+      if (!_db[path]) return;
+      Object.keys(_db[path]).forEach(key => {
+        fireAddEvent(path, key, _db[path][key]);
+      });
+    });
+  }
+
+  function loginUserWithEmail(email) {
+    if (!_users[email]) {
+      console.error('Trying to log-in non-existing email');
+      return;
+    }
+
+    const usr = _users[email];
+    const userPub = {
+      uid: usr.uid,
+      email: email
+    };
+
+    _signedUserEmail = email;
+    authCallbacks.forEach(f => f(userPub));
+  }
+
+
+  // Run initial elements adding (items from demo-data.js)
+
+  setTimeout(fireInitialAdd, 1000);
+  setTimeout(() => {
+    if (AUTO_LOGIN_EMAIL) {
+      loginUserWithEmail(AUTO_LOGIN_EMAIL);
+    } else {
+      authCallbacks.forEach(f => f(null));
+    }
+  }, 1200);
+
+  window.Db = Object.assign(window.Db || {}, {
+
+    _add: function(path, value) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          if (!_db[path])
+            _db[path] = {}
+
+          const id = generatePushID();
+          _db[path][id] = value;
+          fireAddEvent(path, id, value);
+          resolve();
+        }, FAKE_DELAY);
+      });
+    },
+
+
+    _update: function(path, id, value) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          if (!_db[path])
+            _db[path] = {}
+
+          _db[path][id] = value;
+          fireUpdateEvent(path, id, value);
+          resolve();
+        }, FAKE_DELAY);
+      });
+    },
+
+
+    _delete: function(path, id) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          if (!_db[path])
+            reject({message: "Path not found"});
+
+          if (!_db[path][id])
+            reject({message: "ID not found"});
+
+          delete _db[path][id];
+          fireDeleteEvent(path, id);
+          resolve();
+        }, FAKE_DELAY);
+      });
+    },
+
+
+    _login: function(credentials) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          if (!_users[credentials.email] ||
+              _users[credentials.email].password != credentials.password) {
+            reject({message: "Invalid email or password."});
+            return;
+          }
+
+          loginUserWithEmail(credentials.email);
+          resolve();
+        }, FAKE_DELAY);
+      });
+    },
+
+
+    _logout: function() {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          _signedUserEmail = null;
+          authCallbacks.forEach(f => f(null));
+          resolve();
+        }, FAKE_DELAY);
+      });
+    },
+
+
+    _createUser: function(credentials) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          if (_users[credentials.email]) {
+            reject({message: "User with such email already exists"});
+            return;
+          }
+
+          _users[credentials.email] = {
+            password: credentials.password,
+            uid: generatePushID()
+          };
+
+          loginUserWithEmail(credentials.email);
+          resolve();
+        }, FAKE_DELAY);
+      });
+    },
+
+
+    _sendPasswordResetEmail: function(email) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          resolve();
+        }, FAKE_DELAY);
+      });
+    },
+
+
+    _confirmPasswordReset: function(code, newPassword) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          resolve();
+        }, FAKE_DELAY);
+      });
+    },
+
+
+    genId: generatePushID,
+
+
+    connectAuthActions: function(dispatch) {
+      authCallbacks.push(function(user) {
+        if (user) {
+          dispatch({
+            type: 'LOGIN_SUCCESS',
+            user: user
+          });
+        } else {
+          dispatch({
+            type: 'LOGOUT_SUCCESS',
+          });
+        }
+      });
+    },
+
+
+    connectToActions: function(dispatch, entitiesStr, entityStr) {
+      const entityStrUU = entityStr.toUpperCase();
+
+      addCallback(entitiesStr, 'add', (key, value) => {
+        dispatch({
+          type: `ADD_${entityStrUU}_SUCCESS`,
+          key: key,
+          value: value
+        });
+      });
+
+      addCallback(entitiesStr, 'update', (key, value) => {
+        dispatch({
+          type: `UPDATE_${entityStrUU}_SUCCESS`,
+          key: key,
+          value: value
+        });
+      });
+
+      addCallback(entitiesStr, 'delete', (key) => {
+        dispatch({
+          type: `DELETE_${entityStrUU}_SUCCESS`,
+          key: key
+        });
+      });
+    },
+
+  });
+})();
+</script>

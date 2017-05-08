@@ -69,11 +69,29 @@
         return state;
     }
   }
+  <% if (includeDb) { %>
+  function loggedUser(state, action) {
+    if (!state) {
+      state = null;
+    }
 
+    switch (action.type) {
+      case 'LOGIN_SUCCESS':
+        return action.user;
+      case 'LOGOUT_SUCCESS':
+        return null;
+      default:
+        return state;
+    }
+  }
+  <% } %>
   reducer = Redux.combineReducers({
     counters,
     screen,
-    boundCounter
+    boundCounter<% if (includeDb) { %>,
+    loggedUser,
+    users: Db.makeEntityReducer('user'),
+    things: Db.makeEntityReducer('thing')<% } %>
   });
 
 })();

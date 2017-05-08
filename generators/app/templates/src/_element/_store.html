@@ -1,10 +1,12 @@
-
+<link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
+<% if (includeDb) { %>
+<link rel="import" href="db.html">
+<% } %>
 
 <script src="../../node_modules/redux/dist/redux.js"></script>
 <script src="../../node_modules/redux-thunk/dist/redux-thunk.js"></script>
 <!--<script src="../../node_modules/reselect/dist/reselect.js"></script>-->
 
-<link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
 
 <script src="reducers.js"></script>
 <script src="actions.js"></script>
@@ -12,8 +14,10 @@
 <script>
     const store = Redux.createStore(
       reducer,
-      Redux.applyMiddleware(ReduxThunk.default),
-      window.devToolsExtension && window.devToolsExtension()
+      Redux.compose(
+        Redux.applyMiddleware(ReduxThunk.default),
+        window.devToolsExtension && window.devToolsExtension()
+      )
     );
 
     // Weird syntax because of errors in `polymer build`

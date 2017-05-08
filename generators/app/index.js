@@ -37,7 +37,13 @@ module.exports = yeoman.Base.extend({
       {
         type: 'input',
         name: 'description',
-        message: 'Brief description of the application',
+        message: 'Brief description of the application'
+      },
+      {
+        type: 'confirm',
+        name: 'includeDb',
+        message: 'Prepare database support? (experimental)',
+        default: true
       }
     ];
 
@@ -78,13 +84,20 @@ module.exports = yeoman.Base.extend({
       this.props);
 
     var that = this;
-    ['actions.js', 'reducers.js', 'store.html']
-      .forEach(function (file) {
-        that.fs.copyTpl(
-          that.templatePath('src/_element/_' + file),
-          'src/' + elementName + '/' + file,
-          that.props);
-      });
+    var elemFiles = ['actions.js', 'reducers.js', 'store.html'];
+    if (this.props.includeDb) {
+      elemFiles = elemFiles.concat([
+        'db-base.html', 'db-memory.html', 'db.html', 'db-firebase.html',
+        'uid-generator.html'
+      ]);
+    }
+
+    elemFiles.forEach(function (file) {
+      that.fs.copyTpl(
+        that.templatePath('src/_element/_' + file),
+        'src/' + elementName + '/' + file,
+        that.props);
+    });
   },
 
   install: function () {
