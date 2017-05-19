@@ -1,6 +1,6 @@
 {
   "name": "generator-polymer-init-redux",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Polymer PRPL project generator with Redux",
   "homepage": "",
   "author": {
