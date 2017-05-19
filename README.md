@@ -1,6 +1,21 @@
 # generator-polymer-init-redux [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 > Polymer PRPL project generator with Redux
 
+## Features
+
+- Redux (via [PolymerRedux](https://github.com/tur-nr/polymer-redux))
+- Redux Thunk
+- New element adding (see below)
+- Service worker
+- Lazy-loading screens
+- Routing and URL synchronization with Redux
+
+## TODO
+
+- Generator tests
+- Generate test templates for new elements
+- Optional databases/backend integration support (see 'db' branch)
+
 ## Installation
 
 First, install [Yeoman](http://yeoman.io) and generator-polymer-init-redux using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
