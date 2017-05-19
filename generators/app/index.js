@@ -88,7 +88,7 @@ module.exports = yeoman.Base.extend({
     if (this.props.includeDb) {
       elemFiles = elemFiles.concat([
         'db-base.html', 'db-memory.html', 'db.html', 'db-firebase.html',
-        'uid-generator.html'
+        'uid-generator.html', 'demo-data.js'
       ]);
     }
 
